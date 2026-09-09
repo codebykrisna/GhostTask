@@ -1,0 +1,477 @@
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="ghost">👻</div>
+      <div>
+        <h2>Ghost<span>Task</span></h2>
+        <p>Tasks today.<br>Better tomorrow.</p>
+      </div>
+    </div>
+
+    <nav class="navigation">
+
+      <a class="nav-item active">
+        <span>⌂</span>
+        <span>Home</span>
+      </a>
+
+      <a class="nav-item">
+        <span>☷</span>
+        <span>All Tasks</span>
+      </a>
+
+      <a class="nav-item">
+        <span>✓</span>
+        <span>Completed</span>
+      </a>
+
+      <a class="nav-item">
+        <span>☆</span>
+        <span>Important</span>
+      </a>
+
+      <a class="nav-item">
+        <span>♜</span>
+        <span>Trash</span>
+      </a>
+
+    </nav>
+
+    <div class="quote-card">
+      <p>"Small steps make big things happen."</p>
+      <span>👻</span>
+    </div>
+
+  </aside>
+
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+
+      <div class="welcome">
+        <p>WELCOME BACK, KRISHNA 👋</p>
+      </div>
+
+      <div class="top-actions">
+
+        <div class="search-box">
+          <span>⌕</span>
+          <input type="text" placeholder="Search tasks..." [(ngModel)]="searchTerm" />
+          <kbd>Ctrl K</kbd>
+        </div>
+
+        <button class="icon-button">
+          ◐
+        </button>
+
+        <div class="profile">
+          KR
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- Hero -->
+    <section class="hero">
+
+      <div class="hero-text">
+
+        <p class="eyebrow">YOUR PRODUCTIVITY UNIVERSE</p>
+
+        <h1>
+          Turn Plans Into
+          <span>Progress</span>
+          <strong>⚡</strong>
+        </h1>
+
+        <p class="subtitle">
+          Capture your thoughts, organize your work,
+          and watch your productivity come to life.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- Add Task -->
+    <section class="task-input">
+
+      <div class="plus">
+        +
+      </div>
+
+      <input #taskInput type="text" placeholder="What's your next move?"
+        (keyup.enter)="addTask(taskInput.value); taskInput.value = ''" />
+
+      <button (click)="addTask(taskInput.value); taskInput.value = ''">
+        Add Task
+        <span>➤</span>
+      </button>
+
+    </section>
+
+
+    <!-- Filters -->
+    <div class="filters">
+
+      <button class="filter-btn" [class.active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
+        ALL
+      </button>
+
+      <button class="filter-btn" [class.active]="activeFilter === 'ACTIVE'" (click)="setFilter('ACTIVE')">
+        ACTIVE
+      </button>
+
+      <button class="filter-btn" [class.active]="activeFilter === 'COMPLETED'" (click)="setFilter('COMPLETED')">
+        COMPLETED
+      </button>
+
+      <button class="filter-btn" [class.active]="activeFilter === 'IMPORTANT'" (click)="setFilter('IMPORTANT')">
+        IMPORTANT
+      </button>
+
+    </div>
+
+
+    <!-- Dashboard Area -->
+    <section class="dashboard-grid">
+
+      <!-- Floating Tasks -->
+      <div class="task-universe">
+
+        <div class="section-title">
+          <span>Your Task Universe</span>
+          <small>{{ tasks.length }} tasks floating around</small>
+        </div>
+
+        <div class="bubbles">
+          @if (isLoading) {
+
+          <div class="empty-state">
+
+            <div class="empty-ghost">
+              👻
+            </div>
+
+            <h3>Summoning your tasks...</h3>
+
+            <p>
+              Connecting to the Ghost Realm.
+            </p>
+
+          </div>
+
+          } @else if (errorMessage) {
+
+          <div class="empty-state error-state">
+
+            <div class="empty-ghost">
+              ⚠️
+            </div>
+
+            <h3>Ghost Realm disconnected</h3>
+
+            <p>
+              {{ errorMessage }}
+            </p>
+
+            <button class="retry-button" (click)="loadTasks()">
+              ↻ Try Again
+            </button>
+
+          </div>
+
+          } @else if (filteredTasks.length > 0) {
+
+          @for (task of filteredTasks; track task.id) {
+
+          <div class="task-bubble" [class]="task.bubbleClass" [class.completed]="task.completed"
+            (click)="openTask(task)">
+
+            <div class="bubble-icon">
+              {{ task.icon }}
+            </div>
+
+            <h3>{{ task.title }}</h3>
+
+            <span class="priority" [class.high]="task.priority === 'HIGH'" [class.medium]="task.priority === 'MEDIUM'"
+              [class.low]="task.priority === 'LOW'">
+              {{ task.priority }}
+            </span>
+
+            <div class="bubble-check">
+              {{ task.completed ? '✓' : '○' }}
+            </div>
+
+          </div>
+
+          }
+
+          } @else {
+
+          <div class="empty-state">
+
+            <div class="empty-ghost">
+              👻
+            </div>
+
+            <h3>No ghosts found</h3>
+
+            <p>
+              Try another filter or search for something else.
+            </p>
+
+          </div>
+          }
+
+        </div>
+
+      </div>
+
+
+      <!-- Right Panel -->
+      <aside class="right-panel">
+
+        <div class="journey-card">
+
+          <div class="card-heading">
+            <div>
+              <h3>Your Journey</h3>
+              <p>Keep going 🚀</p>
+            </div>
+
+            <div class="progress-ring" [style.background]="
+                    'radial-gradient(circle, #0a0b1c 55%, transparent 57%), ' +
+                    'conic-gradient(#7863ff ' + progressPercentage + '%, #24264a 0)'
+                ">
+              <span>{{ progressPercentage }}%</span>
+            </div>
+          </div>
+
+          <div class="stats">
+
+            <div>
+              <i class="completed-dot"></i>
+              <span><strong>{{ completedTasks }}</strong> Completed</span>
+            </div>
+
+            <div>
+              <i class="progress-dot"></i>
+              <span><strong>{{ activeTasks }}</strong> In Progress</span>
+            </div>
+
+            <div>
+              <i class="pending-dot"></i>
+              <span><strong>{{pendingTasks}}</strong> Pending</span>
+            </div>
+
+            <div>
+              <i class="important-dot"></i>
+              <span><strong>{{ importantTasks }}</strong> Important</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="motivation-card">
+
+          <div class="quote-mark">"</div>
+
+          <p>
+            A productive day
+            is a happy day.
+          </p>
+
+          <span>— GhostTask</span>
+
+        </div>
+
+      </aside>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+      <span>Good Tasks. Brighter Tomorrows. ♡</span>
+      <small>GhostTask • Productivity with a little magic</small>
+    </footer>
+
+  </main>
+  @if (selectedTask) {
+
+  <div class="modal-backdrop" (click)="closeTask()">
+
+    <div class="task-modal" (click)="$event.stopPropagation()">
+
+      <button class="modal-close" (click)="closeTask()">
+        ×
+      </button>
+
+      @if (!isEditing) {
+
+      <div class="modal-icon" [class]="selectedTask.bubbleClass">
+        {{ selectedTask.icon }}
+      </div>
+
+      <p class="modal-label">TASK DETAILS</p>
+
+      <h2>{{ selectedTask.title }}</h2>
+
+      @if (selectedTask.description) {
+      <p class="modal-description">
+        {{ selectedTask.description }}
+      </p>
+      }
+
+      <div class="modal-priority">
+
+        <span>PRIORITY</span>
+
+        <div class="priority-options">
+
+          <button class="priority-option high" [class.selected]="selectedTask.priority === 'HIGH'"
+            (click)="changePriority(selectedTask, 'HIGH')">
+            🔥 HIGH
+          </button>
+
+          <button class="priority-option medium" [class.selected]="selectedTask.priority === 'MEDIUM'"
+            (click)="changePriority(selectedTask, 'MEDIUM')">
+            ⚡ MEDIUM
+          </button>
+
+          <button class="priority-option low" [class.selected]="selectedTask.priority === 'LOW'"
+            (click)="changePriority(selectedTask, 'LOW')">
+            🌙 LOW
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="modal-actions">
+
+        <button class="edit-button" (click)="startEditing(selectedTask)">
+          ✏ Edit
+        </button>
+
+        @if (!selectedTask.completed) {
+        <button class="complete-button" (click)="completeTask(selectedTask)">
+          ✓ Complete Task
+        </button>
+        }
+
+        <button class="delete-button" (click)="deleteTask(selectedTask)">
+          🗑 Delete
+        </button>
+
+      </div>
+
+      } @else {
+
+      <p class="modal-label">EDIT TASK</p>
+
+      <div class="edit-form">
+
+        <label>TITLE</label>
+
+        <input type="text" [(ngModel)]="editTitle" placeholder="Task title" />
+
+        <label>DESCRIPTION</label>
+
+        <textarea [(ngModel)]="editDescription" placeholder="Describe your task..." rows="4"></textarea>
+
+        <label>PRIORITY</label>
+
+        <div class="priority-options">
+
+          <button class="priority-option high" [class.selected]="editPriority === 'HIGH'"
+            (click)="editPriority = 'HIGH'">
+            🔥 HIGH
+          </button>
+
+          <button class="priority-option medium" [class.selected]="editPriority === 'MEDIUM'"
+            (click)="editPriority = 'MEDIUM'">
+            ⚡ MEDIUM
+          </button>
+
+          <button class="priority-option low" [class.selected]="editPriority === 'LOW'" (click)="editPriority = 'LOW'">
+            🌙 LOW
+          </button>
+
+        </div>
+
+        <div class="modal-actions">
+
+          <button class="cancel-button" (click)="cancelEditing()">
+            Cancel
+          </button>
+
+          <button class="save-button" (click)="saveTask()">
+            ✓ Save Changes
+          </button>
+
+        </div>
+
+      </div>
+
+      }
+    </div>
+
+  </div>
+
+  }
+
+  @if (taskToDelete) {
+
+  <div class="delete-backdrop" (click)="cancelDelete()">
+
+    <div class="delete-modal" (click)="$event.stopPropagation()">
+
+      <div class="delete-icon">
+        ⚠️
+      </div>
+
+      <p class="modal-label">
+        DELETE TASK?
+      </p>
+
+      <h2>
+        {{ taskToDelete.title }}
+      </h2>
+
+      <p class="delete-warning">
+        This task will be permanently removed
+        from your Ghost Realm.
+      </p>
+
+      <div class="delete-actions">
+
+        <button class="cancel-button" (click)="cancelDelete()">
+          CANCEL
+        </button>
+
+        <button class="confirm-delete-button" (click)="confirmDelete()">
+          🗑 DELETE
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  }
+
+</div>
